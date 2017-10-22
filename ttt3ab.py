@@ -48,6 +48,18 @@ class State:
         return resultDict[self.winner()]
 
     def score(self, xTurn):
+        def count(lineSet, multiplier):
+            count = 0
+            for combo in lineSet:
+                plr = 0
+                opp = 0
+                for index in combo:
+                    if self.board[index] == self.currPiece(xTurn):
+                        plr+=1
+                    elif self.board[index] != ' ':
+                        opp+=1
+                count += check(plr, opp, multiplier)
+            return count
         def check(plr, opp, multiplier):
             score = 0
             if plr == 3:
@@ -64,24 +76,8 @@ class State:
                 score += 1*multiplier
             return score
         score = 0
-        for combo in State.hvlines:
-            plr = 0
-            opp = 0
-            for index in combo:
-                if self.board[index] == self.currPiece(xTurn):
-                    plr+=1
-                elif self.board[index] != ' ':
-                    opp+=1
-            score += check(plr, opp, 1)
-        for combo in State.dlines:
-            plr = 0
-            opp = 0
-            for index in combo:
-                if self.board[index] == self.currPiece(xTurn):
-                    plr+=1
-                elif self.board[index] != ' ':
-                    opp+=1
-            score += check(plr, opp, 2)
+        score += count(State.hvlines, 1)
+        score += count(State.dlines, 2)
         if xTurn:
             return score
         else:
@@ -139,12 +135,14 @@ class State:
             print('Invalid tile!')
             return self
 
+    # Displays the board.
     def display(self):
         for i in range(len(self.board)):
             print(self.board[i], end='')
             if (i+1)%3 == 0: print('')
         print('')
 
+# Displays menu and takes input for start() function.
 def menu():
     print('1: MINIMAX VS. MINIMAX\n' + \
         '2: MINIMAX VS. RANDOM\n' + \
@@ -159,6 +157,12 @@ def menu():
         print('Invalid entry!')
     return True
 
+'''
+Starts simulation.
+    1. Minimax vs. Minimax
+    2. Minimax vs. Random
+    3. Minimax vs. User
+'''
 def start(mode=1):
     currState = State()
     turn = True
