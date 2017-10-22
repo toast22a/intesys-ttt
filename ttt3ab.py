@@ -3,7 +3,8 @@
     SOLIVEN, ADRIENNE FRANCESCA O.
     INTESYS S18
 
-    A tic-tac-toe bot utilizing the Minimax algorithm.
+    A tic-tac-toe bot utilizing the Minimax algorithm
+    with alpha-beta pruning.
         User given three options:
         1. Simulate game between two Minimax bots.
         2. Simulate game between one Minimax and one random bot.
@@ -24,7 +25,6 @@ class State:
         nb = State()
         for i in range(len(nb.board)):
             nb.board[i] = self.board[i]
-        #print(len(nb.board)) #dlpr
         return nb
 
     def currPiece(self, xTurn):
@@ -97,7 +97,6 @@ class State:
 
     def minimax(self, xTurn, depth, a, b):
         children = self.nextStates(xTurn)
-        #print(len(children)) #dlpr
         scores = []
         if children == [] or depth == 0:
             return (self, self.score(xTurn))
@@ -112,7 +111,6 @@ class State:
             else:
                 b = min(b, cs)
             
-        #print(scores) #dlpr
         if xTurn:
             bestIndex = scores.index(max(scores))
         else:
