@@ -14,13 +14,16 @@
 import random
 
 class State:
+    # Horizontal and vertical win lines on the board.
     hvlines = ((0,1,2),(3,4,5),(6,7,8),\
                 (0,3,6),(1,4,7),(2,5,8))
+    # Diagonal win lines on the board.
     dlines = ((0,4,8),(2,4,6))
 
     def __init__(self):
         self.board = [' ' for x in range(9)]
 
+    # Returns a clone of the State object.
     def clone(self):
         nb = State()
         for i in range(len(nb.board)):
@@ -33,6 +36,13 @@ class State:
     def freeSpaces(self):
         return [i for i in range(len(self.board)) if self.board[i] == ' ']
 
+    '''
+    Returns representation of game result as a string.
+        'x': x wins
+        'o': o wins
+        'xo': draw
+        ' ': game not done yet
+    '''
     def winner(self):
         for combo in State.hvlines + State.dlines:
             if len(set([self.board[x] for x in combo])) == 1 and self.board[combo[0]] != ' ':
@@ -42,11 +52,22 @@ class State:
         else:
             return ' '
 
+    # Returns result message based on return value of winner().
     def resultMessage(self):
         resultDict = {'x':"X wins!", 'o':"O wins!", \
             'xo':"It's a draw!", ' ':"Game isn't over yet!"}
         return resultDict[self.winner()]
 
+    '''
+    Returns local score of:
+        x if xTurn == True
+        o otherwise
+    Diagonal lines are given more priority than horizontal/vertical.
+    Blocking opponent is given a higher score, while allowing an opponent
+        a win line on the next turn is given lower score.
+    Attempting to complete a line (2 pieces on one line) is also given
+        higher score.
+    '''
     def score(self, xTurn):
         def count(lineSet, multiplier):
             count = 0
@@ -83,6 +104,10 @@ class State:
         else:
             return -score
 
+    '''
+    Returns list of next states. xTurn's value determines whose turn is
+        considered (x or o).
+    '''
     def nextStates(self, xTurn):
         ns = []
         for i in self.freeSpaces():
@@ -91,6 +116,7 @@ class State:
             ns.append(tmp)
         return ns
 
+    # The minimax function with a-b pruning implemented.
     def minimax(self, xTurn, depth, a, b):
         children = self.nextStates(xTurn)
         scores = []
@@ -113,6 +139,11 @@ class State:
             bestIndex = scores.index(min(scores))
         return (children[bestIndex], scores[bestIndex])
 
+    '''
+    Returns a random next state. New placement is determined by xTurn and
+        chosen from list of free spaces on the board.
+    If the board is full, return the current state itself.
+    '''
     def randomChild(self, xTurn):
         fs = self.freeSpaces()
         if fs != []:
@@ -121,6 +152,12 @@ class State:
             return rc
         return self
 
+    
+    '''
+    Returns a next state. New placement is determined by xTurn and
+        a manually input index (taken as parameter).
+    If the index is invalid, return the current state itself.
+    '''
     def manualChild(self, xTurn, index):
         try:
             index = int(index)
